@@ -68,6 +68,7 @@
         <div id="clientesContainer" class="space-y-4"></div>
     </div>
 
+    <!-- Modal Cliente -->
     <div id="modalCliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -87,6 +88,7 @@
         </div>
     </div>
 
+    <!-- Modal Operação -->
     <div id="modalOperacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -291,11 +293,30 @@
 
         function excluirCliente(id) { if(confirm('Excluir tudo deste cliente?')) { clientes = clientes.filter(x => x.id != id); salvarTudo(); } }
 
+        // FUNÇÃO CORRIGIDA PARA WHATSAPP (APENAS LINK WEB)
         function compartilharCobranca(id) {
             const c = clientes.find(x => x.id == id);
-            const num = c.telefone.replace(/\D/g, ''); 
-            const msg = `*RESUMO FINANCEIRO*\n\nOlá, ${c.nome}.\nSeu saldo atual é: *R$ ${formatBRL(c.saldoDevedor)}*.\n\n_Gerado por CrediControl Pro+_`;
-            window.location.href = `https://api.whatsapp.com/send?phone=55${num}&text=${encodeURIComponent(msg)}`;
+            if (!c) return;
+            
+            const numeroLimpo = c.telefone.replace(/\D/g, '');
+            const mensagem = `*RESUMO FINANCEIRO*\n\nOlá, ${c.nome}.\nSeu saldo atual é: *R$ ${formatBRL(c.saldoDevedor)}*.\n\n_Gerado por CrediControl Pro+_`;
+            const textoCodificado = encodeURIComponent(mensagem);
+            
+            // Link web oficial do WhatsApp (funciona em qualquer navegador/WebView)
+            const urlWeb = `https://api.whatsapp.com/send?phone=55${numeroLimpo}&text=${textoCodificado}`;
+            
+            // Abre em nova janela/aba
+            const novaJanela = window.open(urlWeb, '_blank');
+            
+            // Fallback caso o popup seja bloqueado
+            if (!novaJanela) {
+                const msgFallback = `Não foi possível abrir o WhatsApp automaticamente.\n\nCopie o número e a mensagem:\n\n📞 55 ${numeroLimpo}\n\n📝 ${mensagem}`;
+                alert(msgFallback);
+                // Tenta copiar para área de transferência
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(`55${numeroLimpo} ${mensagem}`).catch(()=>{});
+                }
+            }
         }
 
         salvarTudo();
