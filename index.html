@@ -1,18 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>CrediControl Pro | Juros Recorrentes</title>
+    <title>CrediControl Pro | Gestão e Score</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         * { font-family: 'Inter', sans-serif; }
         body { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
         .card-hover { transition: all 0.3s; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15); }
-        .progress-bar { transition: width 0.5s ease-out; }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px; font-size: 14px; z-index: 1000; animation: toastFade 3s ease forwards; }
         @keyframes toastFade { 0% { opacity: 0; transform: translateX(-50%) translateY(20px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         .badge { padding: 4px 8px; font-size: 10px; font-weight: bold; border-radius: 9999px; }
@@ -53,7 +53,7 @@
                 <p class="text-xs font-bold text-gray-400 uppercase">Descontos</p>
                 <p class="text-2xl font-black text-purple-600" id="totalDescontos">R$ 0</p>
             </div>
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 shadow-md">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 shadow-md">
                 <p class="text-xs font-bold text-blue-100 uppercase">Saldo Devedor</p>
                 <p class="text-2xl font-black text-white" id="saldoGlobal">R$ 0</p>
             </div>
@@ -77,9 +77,9 @@
             </div>
             <form id="formCliente">
                 <input type="hidden" id="clienteEditId">
-                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Nome *</label><input type="text" id="clienteNome" required class="w-full border rounded-lg p-3 text-sm"></div>
-                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Telefone (com DDD)</label><input type="text" id="clienteTelefone" placeholder="31999999999" class="w-full border rounded-lg p-3 text-sm"></div>
-                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Email</label><input type="email" id="clienteEmail" class="w-full border rounded-lg p-3 text-sm"></div>
+                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Nome *</label><input type="text" id="clienteNome" required class="w-full border rounded-lg p-3 text-sm outline-none focus:border-blue-500"></div>
+                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Telefone (WhatsApp)</label><input type="text" id="clienteTelefone" placeholder="31999999999" class="w-full border rounded-lg p-3 text-sm outline-none"></div>
+                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Email</label><input type="email" id="clienteEmail" class="w-full border rounded-lg p-3 text-sm outline-none"></div>
                 <div class="flex gap-3">
                     <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl">Salvar</button>
                     <button type="button" onclick="fecharModalCliente()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
@@ -98,7 +98,7 @@
                 <input type="hidden" id="operacaoClienteId">
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Tipo *</label>
-                    <select id="operacaoTipo" class="w-full border rounded-lg p-3 text-sm">
+                    <select id="operacaoTipo" class="w-full border rounded-lg p-3 text-sm bg-white">
                         <option value="emprestimo">💰 Empréstimo</option>
                         <option value="pagamento">💵 Pagamento</option>
                         <option value="desconto">🎯 Desconto</option>
@@ -108,115 +108,47 @@
                 <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Valor (R$)</label><input type="text" id="operacaoValor" class="w-full border rounded-lg p-3 text-sm" placeholder="0,00"></div>
                 <div class="mb-4" id="campoTaxa"><label class="block text-sm font-bold text-gray-700 mb-1">Taxa de Juros Mensal (%)</label><input type="text" id="operacaoTaxa" class="w-full border rounded-lg p-3 text-sm" placeholder="5"></div>
                 <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Data</label><input type="date" id="operacaoData" class="w-full border rounded-lg p-3 text-sm"></div>
-                <div class="flex gap-3">
-                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl">Registrar</button>
-                    <button type="button" onclick="fecharModalOperacao()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
-                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg">Registrar</button>
             </form>
         </div>
     </div>
 
     <script>
-        let clientes = JSON.parse(localStorage.getItem("credicontrol_juros")) || [];
+        let clientes = JSON.parse(localStorage.getItem("credicontrol_final_v5")) || [];
         
-        function formatBRL(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-        function parseBRL(v) { return parseFloat((v || '0').replace(/\./g, '').replace(',', '.')) || 0; }
+        const formatBRL = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        const parseBRL = v => parseFloat((v || '0').replace(/\./g, '').replace(',', '.')) || 0;
         
         function mostrarToast(msg) {
-            let toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            let t = document.createElement('div'); t.className = 'toast'; t.innerHTML = msg;
+            document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+
+        function calcularScore(c) {
+            if (c.totalPrincipal === 0) return 100;
+            let totalDevido = c.totalPrincipal + c.totalJuros;
+            let totalPago = c.totalPago + c.totalDescontos;
+            let score = Math.round((totalPago / totalDevido) * 100);
+            if (c.totalJuros > c.totalPrincipal) score -= 15;
+            return Math.min(100, Math.max(0, score));
         }
         
-        function recalcularCliente(cliente) {
-            let principal = 0, jurosCobrados = 0, pago = 0, descontos = 0, saldo = 0;
-            cliente.historico = cliente.historico || [];
-            let historicoOrdenado = [...cliente.historico].sort((a,b) => new Date(a.data) - new Date(b.data));
-            
-            for(let op of historicoOrdenado) {
-                if(op.tipo === 'emprestimo') { principal += op.valor; saldo += op.valor; } 
-                else if(op.tipo === 'juros') { jurosCobrados += op.valor; saldo += op.valor; }
-                else if(op.tipo === 'pagamento') { pago += op.valor; saldo -= op.valor; }
-                else if(op.tipo === 'desconto') { descontos += op.valor; saldo -= op.valor; }
-            }
-            
-            cliente.totalPrincipal = principal;
-            cliente.totalJuros = jurosCobrados;
-            cliente.totalPago = pago;
-            cliente.totalDescontos = descontos;
-            cliente.saldoDevedor = saldo < 0 ? 0 : saldo;
-            
-            let totalAbatido = pago + descontos;
-            cliente.percentualPagoComJuros = (principal + jurosCobrados) > 0 ? (totalAbatido / (principal + jurosCobrados) * 100) : 0;
-            if(cliente.percentualPagoComJuros > 100) cliente.percentualPagoComJuros = 100;
-            
-            return cliente;
-        }
-
-        function compartilharCobranca(id) {
-            const c = clientes.find(c => c.id == id);
-            if (!c) return;
-
-            const status = c.saldoDevedor <= 0 ? "✅ QUITADO" : "⚠️ PENDENTE";
-            const msg = `*RESUMO DE CONTA - CrediControl*\n\n` +
-                        `👤 *Cliente:* ${c.nome}\n` +
-                        `📊 *Status:* ${status}\n` +
-                        `----------------------------\n` +
-                        `💰 *Principal:* R$ ${formatBRL(c.totalPrincipal)}\n` +
-                        `📈 *Juros Acumulados:* R$ ${formatBRL(c.totalJuros)}\n` +
-                        `💵 *Total Pago:* R$ ${formatBRL(c.totalPago)}\n` +
-                        `🎯 *Descontos:* R$ ${formatBRL(c.totalDescontos)}\n` +
-                        `----------------------------\n` +
-                        `🔻 *SALDO DEVEDOR:* R$ ${formatBRL(c.saldoDevedor)}\n\n` +
-                        `_Gerado em: ${new Date().toLocaleDateString('pt-BR')}_`;
-
-            if (navigator.share) {
-                navigator.share({ title: 'Resumo de Dívida', text: msg }).catch(() => {});
-            } else {
-                const fone = c.telefone ? c.telefone.replace(/\D/g, '') : '';
-                window.open(`https://wa.me/${fone}?text=${encodeURIComponent(msg)}`, '_blank');
-            }
-        }
-
-        // FUNÇÃO PARA APLICAR EM UM CLIENTE ESPECÍFICO
-        function aplicarJuroIndividual(id) {
-            const c = clientes.find(x => x.id == id);
-            if (!c || c.saldoDevedor <= 0) {
-                mostrarToast("Cliente sem saldo devedor!");
-                return;
-            }
-            
-            if(confirm(`Aplicar juros de ${c.taxaJurosPadrao}% sobre R$ ${formatBRL(c.saldoDevedor)} para ${c.nome}?`)) {
-                let dataRef = new Date().toISOString().split('T')[0];
-                let valorJuros = c.saldoDevedor * (c.taxaJurosPadrao / 100);
-                
-                c.historico.push({ tipo: 'juros', valor: valorJuros, data: dataRef, obs: 'Aplicado Individual' });
-                c.ultimoJuros = dataRef;
-                
-                salvarTudo();
-                mostrarToast(`Juros aplicado para ${c.nome}!`);
-            }
-        }
-        
-        function aplicarJurosRecorrentes() {
-            let dataRef = new Date().toISOString().split('T')[0];
-            let aplicados = 0;
+        function salvarTudo() {
             clientes.forEach(c => {
-                if(c.saldoDevedor > 0) {
-                    let hoje = new Date();
-                    let ultJuros = c.ultimoJuros ? new Date(c.ultimoJuros) : new Date(0);
-                    if(ultJuros.getMonth() !== hoje.getMonth() || ultJuros.getFullYear() !== hoje.getFullYear()) {
-                        let valorJuros = c.saldoDevedor * (c.taxaJurosPadrao / 100);
-                        c.historico.push({ tipo: 'juros', valor: valorJuros, data: dataRef, obs: 'Automático Geral' });
-                        c.ultimoJuros = dataRef;
-                        aplicados++;
-                    }
-                }
+                let p=0, j=0, pg=0, d=0;
+                c.historico.forEach(op => {
+                    if(op.tipo==='emprestimo') p+=op.valor;
+                    else if(op.tipo==='juros') j+=op.valor;
+                    else if(op.tipo==='pagamento') pg+=op.valor;
+                    else if(op.tipo==='desconto') d+=op.valor;
+                });
+                c.totalPrincipal = p; c.totalJuros = j; c.totalPago = pg; c.totalDescontos = d;
+                c.saldoDevedor = Math.max(0, (p + j) - (pg + d));
+                c.score = calcularScore(c);
             });
-            salvarTudo();
-            mostrarToast(aplicados > 0 ? `${aplicados} juros aplicados!` : 'Todos os juros já estão em dia.');
+            localStorage.setItem("credicontrol_final_v5", JSON.stringify(clientes));
+            recalcularGlobais();
+            renderizarClientes();
         }
 
         function recalcularGlobais() {
@@ -229,137 +161,152 @@
             document.getElementById('saldoGlobal').innerText = `R$ ${formatBRL(s)}`;
         }
 
-        function salvarTudo() {
-            clientes.forEach(c => recalcularCliente(c));
-            localStorage.setItem("credicontrol_juros", JSON.stringify(clientes));
-            recalcularGlobais();
-            renderizarClientes();
-        }
-
         function renderizarClientes() {
             const container = document.getElementById('clientesContainer');
-            if(!clientes.length) { 
-                container.innerHTML = '<div class="bg-white p-10 text-center rounded-2xl border-2 border-dashed text-gray-400">Nenhum cliente cadastrado.</div>';
-                return;
-            }
-            container.innerHTML = clientes.map(c => `
+            if(!clientes.length) { container.innerHTML = '<div class="bg-white p-10 text-center rounded-2xl border-2 border-dashed text-gray-400">Nenhum cliente cadastrado.</div>'; return; }
+            
+            container.innerHTML = clientes.map(c => {
+                const corScore = c.score > 70 ? 'text-emerald-500' : (c.score > 40 ? 'text-amber-500' : 'text-red-500');
+                return `
                 <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-gray-100">
                     <div class="p-5 cursor-pointer" onclick="toggleHistorico('${c.id}')">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold">${c.nome[0].toUpperCase()}</div>
-                                <div><h3 class="font-bold text-gray-800">${c.nome}</h3><p class="text-xs text-gray-400">${c.telefone || 'Sem fone'}</p></div>
+                                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">${c.nome[0].toUpperCase()}</div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">${c.nome}</h3>
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-[9px] font-black ${corScore}">SCORE ${c.score}</span>
+                                        <div class="flex">${Array(5).fill(0).map((_,i) => `<i data-lucide="star" class="w-2.5 h-2.5 ${i < Math.ceil(c.score/20) ? 'fill-current ' + corScore : 'text-gray-200'}"></i>`).join('')}</div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="text-right">
                                 <span class="badge ${c.saldoDevedor > 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}">${c.saldoDevedor > 0 ? 'PENDENTE' : 'QUITADO'}</span>
                                 <p class="text-xl font-black ${c.saldoDevedor > 0 ? 'text-red-600' : 'text-emerald-600'}">R$ ${formatBRL(c.saldoDevedor)}</p>
                             </div>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
-                            <div class="bg-blue-600 h-1.5 rounded-full" style="width: ${c.percentualPagoComJuros}%"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase">
-                            <span>Progresso de Quitação</span>
-                            <span>${c.percentualPagoComJuros.toFixed(1)}%</span>
-                        </div>
                     </div>
                     <div id="historico-${c.id}" class="hidden bg-gray-50 p-5 border-t border-gray-100">
                         <div class="flex flex-wrap gap-2 mb-4">
                             <button onclick="abrirModalOperacao('${c.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">+ Operação</button>
-                            <button onclick="aplicarJuroIndividual('${c.id}')" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">📈 Aplicar Juro</button>
+                            <button onclick="aplicarJuroIndividual('${c.id}')" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">📈 Aplicar Juro</button>
                             <button onclick="compartilharCobranca('${c.id}')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1"><i data-lucide="share-2" class="w-3 h-3"></i> Enviar</button>
                             <button onclick="editarCliente('${c.id}')" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold">Editar</button>
                             <button onclick="excluirCliente('${c.id}')" class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold">Excluir</button>
                         </div>
                         <div class="bg-white rounded-lg border overflow-hidden">
-                            <table class="w-full text-xs">
-                                <thead class="bg-gray-50 border-b">
-                                    <tr><th class="p-2 text-left">Data</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-right">Valor</th><th class="p-2 text-center">Ação</th></tr>
-                                </thead>
-                                <tbody>
-                                    ${c.historico.sort((a,b)=>new Date(b.data)-new Date(a.data)).map((op, idx) => `
-                                        <tr class="border-b">
-                                            <td class="p-2">${new Date(op.data).toLocaleDateString('pt-BR')}</td>
-                                            <td class="p-2 capitalize">${op.tipo}</td>
-                                            <td class="p-2 text-right font-bold">R$ ${formatBRL(op.valor)}</td>
-                                            <td class="p-2 text-center"><button onclick="excluirOperacao('${c.id}', ${idx})" class="text-red-400">✕</button></td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
+                            <table class="w-full text-xs text-left">
+                                <tr class="bg-gray-50 border-b font-bold text-gray-400"><th class="p-2">Data</th><th class="p-2">Tipo</th><th class="p-2 text-right">Valor</th><th class="p-2 text-center">Ação</th></tr>
+                                ${c.historico.sort((a,b)=>new Date(b.data)-new Date(a.data)).map((op, idx) => `
+                                    <tr class="border-b">
+                                        <td class="p-2">${new Date(op.data).toLocaleDateString('pt-BR')}</td>
+                                        <td class="p-2 capitalize">${op.tipo}</td>
+                                        <td class="p-2 text-right font-bold">R$ ${formatBRL(op.valor)}</td>
+                                        <td class="p-2 text-center">
+                                            <button onclick="excluirOperacao('${c.id}', ${c.historico.indexOf(op)})" class="text-red-500 hover:bg-red-50 p-1 rounded-md transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
                             </table>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
             lucide.createIcons();
         }
 
-        // Interface
-        window.toggleHistorico = (id) => document.getElementById(`historico-${id}`).classList.toggle('hidden');
+        window.toggleHistorico = id => document.getElementById(`historico-${id}`).classList.toggle('hidden');
+
         function abrirModalCliente() { 
-            document.getElementById('formCliente').reset();
-            document.getElementById('clienteEditId').value = '';
+            document.getElementById('formCliente').reset(); 
+            document.getElementById('clienteEditId').value = ''; 
             document.getElementById('modalClienteTitle').innerText = 'Novo Cliente';
-            document.getElementById('modalCliente').style.display = 'flex'; 
+            document.getElementById('modalCliente').classList.remove('hidden'); 
         }
-        function fecharModalCliente() { document.getElementById('modalCliente').style.display = 'none'; }
-        
+        function fecharModalCliente() { document.getElementById('modalCliente').classList.add('hidden'); }
+
         document.getElementById('formCliente').addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('clienteEditId').value;
-            const dados = {
-                nome: document.getElementById('clienteNome').value,
-                telefone: document.getElementById('clienteTelefone').value,
-                email: document.getElementById('clienteEmail').value
-            };
+            const nome = document.getElementById('clienteNome').value;
+            const fone = document.getElementById('clienteTelefone').value;
+            const email = document.getElementById('clienteEmail').value;
             if(id) {
                 let c = clientes.find(x => x.id == id);
-                Object.assign(c, dados);
+                c.nome = nome; c.telefone = fone; c.email = email;
                 mostrarToast('Cliente atualizado!');
             } else {
-                clientes.push({ id: Date.now().toString(), ...dados, historico: [], taxaJurosPadrao: 5 });
+                clientes.push({ id: Date.now().toString(), nome, telefone: fone, email, historico: [], taxaJurosPadrao: 5 });
                 mostrarToast('Cliente cadastrado!');
             }
             salvarTudo(); fecharModalCliente();
         });
 
-        function abrirModalOperacao(id) {
-            document.getElementById('operacaoClienteId').value = id;
-            document.getElementById('operacaoValor').value = '';
-            document.getElementById('operacaoData').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modalOperacao').style.display = 'flex';
+        function abrirModalOperacao(id) { 
+            document.getElementById('operacaoClienteId').value = id; 
+            document.getElementById('modalOperacao').classList.remove('hidden'); 
         }
-        function fecharModalOperacao() { document.getElementById('modalOperacao').style.display = 'none'; }
+        function fecharModalOperacao() { document.getElementById('modalOperacao').classList.add('hidden'); }
 
         document.getElementById('formOperacao').addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('operacaoClienteId').value;
             const c = clientes.find(x => x.id == id);
-            const tipo = document.getElementById('operacaoTipo').value;
             const valor = parseBRL(document.getElementById('operacaoValor').value);
             const taxa = parseBRL(document.getElementById('operacaoTaxa').value);
-            
-            if(tipo === 'emprestimo' && taxa > 0) c.taxaJurosPadrao = taxa;
-            c.historico.push({ tipo, valor, data: document.getElementById('operacaoData').value });
+            if(taxa > 0) c.taxaJurosPadrao = taxa;
+            c.historico.push({ tipo: document.getElementById('operacaoTipo').value, valor, data: document.getElementById('operacaoData').value });
             salvarTudo(); fecharModalOperacao();
             mostrarToast('Operação registrada!');
         });
+
+        function excluirOperacao(clienteId, opIndex) {
+            if(confirm('Deseja realmente apagar este lançamento do histórico?')) {
+                const c = clientes.find(x => x.id == clienteId);
+                c.historico.splice(opIndex, 1);
+                salvarTudo();
+                mostrarToast('Lançamento removido!');
+            }
+        }
+
+        function aplicarJuroIndividual(id) {
+            const c = clientes.find(x => x.id == id);
+            if(c.saldoDevedor <= 0) return mostrarToast('Sem saldo para cobrar!');
+            const valorJuros = c.saldoDevedor * (c.taxaJurosPadrao / 100);
+            c.historico.push({ tipo: 'juros', valor: valorJuros, data: new Date().toISOString().split('T')[0] });
+            salvarTudo(); mostrarToast('Juro aplicado!');
+        }
+
+        function aplicarJurosRecorrentes() {
+            clientes.forEach(c => {
+                if(c.saldoDevedor > 0) {
+                    const v = c.saldoDevedor * (c.taxaJurosPadrao / 100);
+                    c.historico.push({ tipo: 'juros', valor: v, data: new Date().toISOString().split('T')[0] });
+                }
+            });
+            salvarTudo(); mostrarToast('Juros globais aplicados!');
+        }
 
         function editarCliente(id) {
             const c = clientes.find(x => x.id == id);
             document.getElementById('clienteEditId').value = c.id;
             document.getElementById('clienteNome').value = c.nome;
             document.getElementById('clienteTelefone').value = c.telefone;
-            document.getElementById('clienteEmail').value = c.email;
+            document.getElementById('clienteEmail').value = c.email || '';
             document.getElementById('modalClienteTitle').innerText = 'Editar Cliente';
-            document.getElementById('modalCliente').style.display = 'flex';
+            document.getElementById('modalCliente').classList.remove('hidden');
         }
 
-        function excluirCliente(id) { if(confirm('Excluir cliente e todo seu histórico?')) { clientes = clientes.filter(x => x.id != id); salvarTudo(); mostrarToast('Cliente removido'); } }
-        function excluirOperacao(cid, oidx) { if(confirm('Excluir esta operação?')) { clientes.find(x => x.id == cid).historico.splice(oidx, 1); salvarTudo(); mostrarToast('Operação removida'); } }
+        function excluirCliente(id) { if(confirm('Excluir cliente e todo o histórico?')) { clientes = clientes.filter(x => x.id != id); salvarTudo(); } }
+
+        function compartilharCobranca(id) {
+            const c = clientes.find(x => x.id == id);
+            const msg = `*RESUMO FINANCEIRO*\nCliente: ${c.nome}\nSaldo Devedor: *R$ ${formatBRL(c.saldoDevedor)}*`;
+            window.open(`https://wa.me/${c.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`);
+        }
 
         salvarTudo();
     </script>
 </body>
 </html>
-
