@@ -21,34 +21,28 @@
 <body class="p-4 md:p-8 min-h-screen">
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent flex items-center gap-2">
                     <i data-lucide="calculator" class="w-8 h-8 text-blue-600"></i>
                     CrediControl Pro+
                 </h1>
-                <p class="text-sm text-gray-600 mt-1">Com juros recorrentes sobre saldo devedor</p>
+                <p class="text-sm text-gray-600 mt-1">Gestão de Crédito e Juros Recorrentes</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="abrirModalCliente()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-5 h-5"></i> Novo Cliente
                 </button>
-                <button onclick="exportarDados()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow transition">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                </button>
             </div>
-            <input type="file" id="importFile" accept=".json" class="hidden" />
         </div>
 
-        <!-- Resumo Global -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
             <div class="bg-white rounded-2xl p-5 shadow-md">
                 <p class="text-xs font-bold text-gray-400 uppercase">Principal</p>
                 <p class="text-2xl font-black text-gray-800" id="totalPrincipal">R$ 0</p>
             </div>
             <div class="bg-white rounded-2xl p-5 shadow-md">
-                <p class="text-xs font-bold text-gray-400 uppercase">Juros Acumulados</p>
+                <p class="text-xs font-bold text-gray-400 uppercase">Juros Totais</p>
                 <p class="text-2xl font-black text-amber-600" id="totalJuros">R$ 0</p>
             </div>
             <div class="bg-white rounded-2xl p-5 shadow-md">
@@ -65,16 +59,16 @@
             </div>
         </div>
 
-        <!-- Lista de Clientes -->
         <div class="mb-4 flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5"></i> Clientes</h2>
-            <button onclick="aplicarJurosRecorrentes()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-full">📈 Aplicar Juros do Mês</button>
+            <button onclick="aplicarJurosRecorrentes()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full font-bold shadow-sm transition">
+                📈 Aplicar Juros Geral (Mês)
+            </button>
         </div>
         
         <div id="clientesContainer" class="space-y-4"></div>
     </div>
 
-    <!-- MODAL CLIENTE -->
     <div id="modalCliente" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -84,7 +78,7 @@
             <form id="formCliente">
                 <input type="hidden" id="clienteEditId">
                 <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Nome *</label><input type="text" id="clienteNome" required class="w-full border rounded-lg p-3 text-sm"></div>
-                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Telefone</label><input type="text" id="clienteTelefone" class="w-full border rounded-lg p-3 text-sm"></div>
+                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Telefone (com DDD)</label><input type="text" id="clienteTelefone" placeholder="31999999999" class="w-full border rounded-lg p-3 text-sm"></div>
                 <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Email</label><input type="email" id="clienteEmail" class="w-full border rounded-lg p-3 text-sm"></div>
                 <div class="flex gap-3">
                     <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl">Salvar</button>
@@ -94,7 +88,6 @@
         </div>
     </div>
 
-    <!-- MODAL OPERAÇÃO -->
     <div id="modalOperacao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -109,14 +102,14 @@
                         <option value="emprestimo">💰 Empréstimo</option>
                         <option value="pagamento">💵 Pagamento</option>
                         <option value="desconto">🎯 Desconto</option>
-                        <option value="juros">📈 Juros (cobrança)</option>
+                        <option value="juros">📈 Juros (avulso)</option>
                     </select>
                 </div>
-                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Valor (R$)</label><input type="text" id="operacaoValor" class="w-full border rounded-lg p-3 text-sm"></div>
-                <div class="mb-4 hidden" id="campoTaxa"><label class="block text-sm font-bold text-gray-700 mb-1">Taxa de Juros (% ao mês)</label><input type="text" id="operacaoTaxa" class="w-full border rounded-lg p-3 text-sm" placeholder="5"></div>
+                <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Valor (R$)</label><input type="text" id="operacaoValor" class="w-full border rounded-lg p-3 text-sm" placeholder="0,00"></div>
+                <div class="mb-4" id="campoTaxa"><label class="block text-sm font-bold text-gray-700 mb-1">Taxa de Juros Mensal (%)</label><input type="text" id="operacaoTaxa" class="w-full border rounded-lg p-3 text-sm" placeholder="5"></div>
                 <div class="mb-4"><label class="block text-sm font-bold text-gray-700 mb-1">Data</label><input type="date" id="operacaoData" class="w-full border rounded-lg p-3 text-sm"></div>
                 <div class="flex gap-3">
-                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl">Salvar</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl">Registrar</button>
                     <button type="button" onclick="fecharModalOperacao()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
                 </div>
             </form>
@@ -126,7 +119,7 @@
     <script>
         let clientes = JSON.parse(localStorage.getItem("credicontrol_juros")) || [];
         
-        function formatBRL(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+        function formatBRL(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
         function parseBRL(v) { return parseFloat((v || '0').replace(/\./g, '').replace(',', '.')) || 0; }
         
         function mostrarToast(msg) {
@@ -137,305 +130,236 @@
             setTimeout(() => toast.remove(), 3000);
         }
         
-        // Cálculo principal com juros recorrentes
         function recalcularCliente(cliente) {
-            let totalPrincipal = 0;
-            let totalJurosCobrados = 0;
-            let totalPago = 0;
-            let totalDescontos = 0;
-            let ultimoSaldo = 0;
-            
+            let principal = 0, jurosCobrados = 0, pago = 0, descontos = 0, saldo = 0;
             cliente.historico = cliente.historico || [];
-            
-            // Ordenar por data para calcular corretamente
             let historicoOrdenado = [...cliente.historico].sort((a,b) => new Date(a.data) - new Date(b.data));
             
             for(let op of historicoOrdenado) {
-                let valor = op.valor;
-                
-                if(op.tipo === 'emprestimo') {
-                    totalPrincipal += valor;
-                    ultimoSaldo += valor;
-                } 
-                else if(op.tipo === 'juros') {
-                    totalJurosCobrados += valor;
-                    ultimoSaldo += valor;
-                }
-                else if(op.tipo === 'pagamento') {
-                    totalPago += valor;
-                    ultimoSaldo -= valor;
-                }
-                else if(op.tipo === 'desconto') {
-                    totalDescontos += valor;
-                    ultimoSaldo -= valor;
-                }
+                if(op.tipo === 'emprestimo') { principal += op.valor; saldo += op.valor; } 
+                else if(op.tipo === 'juros') { jurosCobrados += op.valor; saldo += op.valor; }
+                else if(op.tipo === 'pagamento') { pago += op.valor; saldo -= op.valor; }
+                else if(op.tipo === 'desconto') { descontos += op.valor; saldo -= op.valor; }
             }
             
-            if(ultimoSaldo < 0) ultimoSaldo = 0;
+            cliente.totalPrincipal = principal;
+            cliente.totalJuros = jurosCobrados;
+            cliente.totalPago = pago;
+            cliente.totalDescontos = descontos;
+            cliente.saldoDevedor = saldo < 0 ? 0 : saldo;
             
-            cliente.totalPrincipal = totalPrincipal;
-            cliente.totalJuros = totalJurosCobrados;
-            cliente.totalPago = totalPago;
-            cliente.totalDescontos = totalDescontos;
-            cliente.saldoDevedor = ultimoSaldo;
-            cliente.dividaTotal = totalPrincipal + totalJurosCobrados;
-            
-            let totalAbatido = totalPago + totalDescontos;
-            cliente.percentualPagoSobrePrincipal = totalPrincipal > 0 ? (totalAbatido / totalPrincipal * 100) : 0;
-            if(cliente.percentualPagoSobrePrincipal > 100) cliente.percentualPagoSobrePrincipal = 100;
-            
-            let dividaComJuros = totalPrincipal + totalJurosCobrados;
-            cliente.percentualPagoComJuros = dividaComJuros > 0 ? (totalAbatido / dividaComJuros * 100) : 0;
+            let totalAbatido = pago + descontos;
+            cliente.percentualPagoComJuros = (principal + jurosCobrados) > 0 ? (totalAbatido / (principal + jurosCobrados) * 100) : 0;
             if(cliente.percentualPagoComJuros > 100) cliente.percentualPagoComJuros = 100;
             
             return cliente;
         }
-        
-        // Aplicar juros mensalmente sobre o saldo devedor
-        function aplicarJurosRecorrentes() {
-            let dataReferencia = new Date().toISOString().split('T')[0];
+
+        function compartilharCobranca(id) {
+            const c = clientes.find(c => c.id == id);
+            if (!c) return;
+
+            const status = c.saldoDevedor <= 0 ? "✅ QUITADO" : "⚠️ PENDENTE";
+            const msg = `*RESUMO DE CONTA - CrediControl*\n\n` +
+                        `👤 *Cliente:* ${c.nome}\n` +
+                        `📊 *Status:* ${status}\n` +
+                        `----------------------------\n` +
+                        `💰 *Principal:* R$ ${formatBRL(c.totalPrincipal)}\n` +
+                        `📈 *Juros Acumulados:* R$ ${formatBRL(c.totalJuros)}\n` +
+                        `💵 *Total Pago:* R$ ${formatBRL(c.totalPago)}\n` +
+                        `🎯 *Descontos:* R$ ${formatBRL(c.totalDescontos)}\n` +
+                        `----------------------------\n` +
+                        `🔻 *SALDO DEVEDOR:* R$ ${formatBRL(c.saldoDevedor)}\n\n` +
+                        `_Gerado em: ${new Date().toLocaleDateString('pt-BR')}_`;
+
+            if (navigator.share) {
+                navigator.share({ title: 'Resumo de Dívida', text: msg }).catch(() => {});
+            } else {
+                const fone = c.telefone ? c.telefone.replace(/\D/g, '') : '';
+                window.open(`https://wa.me/${fone}?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        }
+
+        // FUNÇÃO PARA APLICAR EM UM CLIENTE ESPECÍFICO
+        function aplicarJuroIndividual(id) {
+            const c = clientes.find(x => x.id == id);
+            if (!c || c.saldoDevedor <= 0) {
+                mostrarToast("Cliente sem saldo devedor!");
+                return;
+            }
             
-            clientes.forEach(cliente => {
-                let saldoAtual = cliente.saldoDevedor;
-                if(saldoAtual <= 0) return;
+            if(confirm(`Aplicar juros de ${c.taxaJurosPadrao}% sobre R$ ${formatBRL(c.saldoDevedor)} para ${c.nome}?`)) {
+                let dataRef = new Date().toISOString().split('T')[0];
+                let valorJuros = c.saldoDevedor * (c.taxaJurosPadrao / 100);
                 
-                // Verificar se já aplicou juros este mês
-                let ultimoMes = cliente.ultimoJuros || '2000-01-01';
-                let dataUltimo = new Date(ultimoMes);
-                let hoje = new Date();
+                c.historico.push({ tipo: 'juros', valor: valorJuros, data: dataRef, obs: 'Aplicado Individual' });
+                c.ultimoJuros = dataRef;
                 
-                if(dataUltimo.getMonth() !== hoje.getMonth() || dataUltimo.getFullYear() !== hoje.getFullYear()) {
-                    let taxaPadrao = cliente.taxaJurosPadrao || 5; // 5% padrão
-                    let jurosCalculado = saldoAtual * (taxaPadrao / 100);
-                    
-                    if(jurosCalculado > 0) {
-                        cliente.historico.push({
-                            tipo: 'juros',
-                            valor: jurosCalculado,
-                            data: dataReferencia,
-                            obs: `Juros de ${taxaPadrao}% aplicado automaticamente`,
-                            taxa: taxaPadrao
-                        });
-                        cliente.ultimoJuros = dataReferencia;
-                        mostrarToast(`Juros de ${taxaPadrao}% aplicado para ${cliente.nome}: R$ ${formatBRL(jurosCalculado)}`);
+                salvarTudo();
+                mostrarToast(`Juros aplicado para ${c.nome}!`);
+            }
+        }
+        
+        function aplicarJurosRecorrentes() {
+            let dataRef = new Date().toISOString().split('T')[0];
+            let aplicados = 0;
+            clientes.forEach(c => {
+                if(c.saldoDevedor > 0) {
+                    let hoje = new Date();
+                    let ultJuros = c.ultimoJuros ? new Date(c.ultimoJuros) : new Date(0);
+                    if(ultJuros.getMonth() !== hoje.getMonth() || ultJuros.getFullYear() !== hoje.getFullYear()) {
+                        let valorJuros = c.saldoDevedor * (c.taxaJurosPadrao / 100);
+                        c.historico.push({ tipo: 'juros', valor: valorJuros, data: dataRef, obs: 'Automático Geral' });
+                        c.ultimoJuros = dataRef;
+                        aplicados++;
                     }
                 }
             });
-            
             salvarTudo();
+            mostrarToast(aplicados > 0 ? `${aplicados} juros aplicados!` : 'Todos os juros já estão em dia.');
         }
-        
+
         function recalcularGlobais() {
-            let principal=0, juros=0, pago=0, descontos=0, saldo=0;
-            clientes.forEach(c => {
-                principal += c.totalPrincipal;
-                juros += c.totalJuros;
-                pago += c.totalPago;
-                descontos += c.totalDescontos;
-                saldo += c.saldoDevedor;
-            });
-            document.getElementById('totalPrincipal').innerHTML = `R$ ${formatBRL(principal)}`;
-            document.getElementById('totalJuros').innerHTML = `R$ ${formatBRL(juros)}`;
-            document.getElementById('totalPago').innerHTML = `R$ ${formatBRL(pago)}`;
-            document.getElementById('totalDescontos').innerHTML = `R$ ${formatBRL(descontos)}`;
-            document.getElementById('saldoGlobal').innerHTML = `R$ ${formatBRL(saldo)}`;
+            let p=0, j=0, pg=0, d=0, s=0;
+            clientes.forEach(c => { p+=c.totalPrincipal; j+=c.totalJuros; pg+=c.totalPago; d+=c.totalDescontos; s+=c.saldoDevedor; });
+            document.getElementById('totalPrincipal').innerText = `R$ ${formatBRL(p)}`;
+            document.getElementById('totalJuros').innerText = `R$ ${formatBRL(j)}`;
+            document.getElementById('totalPago').innerText = `R$ ${formatBRL(pg)}`;
+            document.getElementById('totalDescontos').innerText = `R$ ${formatBRL(d)}`;
+            document.getElementById('saldoGlobal').innerText = `R$ ${formatBRL(s)}`;
         }
-        
+
         function salvarTudo() {
             clientes.forEach(c => recalcularCliente(c));
             localStorage.setItem("credicontrol_juros", JSON.stringify(clientes));
             recalcularGlobais();
             renderizarClientes();
         }
-        
+
         function renderizarClientes() {
-            let container = document.getElementById('clientesContainer');
-            if(!container) return;
-            
-            if(clientes.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-2xl p-12 text-center border-2 border-dashed"><i data-lucide="users" class="w-16 h-16 mx-auto text-gray-300 mb-3"></i><p class="text-gray-400">Nenhum cliente cadastrado</p><button onclick="abrirModalCliente()" class="mt-3 text-blue-600 font-semibold">+ Cadastrar</button></div>`;
-                lucide.createIcons();
+            const container = document.getElementById('clientesContainer');
+            if(!clientes.length) { 
+                container.innerHTML = '<div class="bg-white p-10 text-center rounded-2xl border-2 border-dashed text-gray-400">Nenhum cliente cadastrado.</div>';
                 return;
             }
-            
-            container.innerHTML = '';
-            clientes.forEach(cliente => {
-                let statusCor = cliente.saldoDevedor <= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700';
-                let statusTexto = cliente.saldoDevedor <= 0 ? 'QUITADO' : 'PENDENTE';
-                let corProgresso = cliente.percentualPagoComJuros >= 80 ? 'bg-emerald-500' : (cliente.percentualPagoComJuros >= 50 ? 'bg-blue-500' : 'bg-amber-500');
-                let historicoOrdenado = [...(cliente.historico || [])].sort((a,b) => new Date(b.data) - new Date(a.data));
-                
-                container.innerHTML += `
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden card-hover">
-                        <div class="p-6 cursor-pointer" onclick="toggleHistorico('${cliente.id}')">
-                            <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">${cliente.nome.substring(0,2).toUpperCase()}</div>
-                                    <div><h3 class="font-bold text-gray-800 text-lg">${cliente.nome}</h3><p class="text-xs text-gray-500">${cliente.telefone || 'Sem telefone'}</p></div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="badge ${statusCor}">${statusTexto}</span>
-                                    <p class="text-2xl font-black mt-1 ${cliente.saldoDevedor > 0 ? 'text-red-600' : 'text-emerald-600'}">R$ ${formatBRL(cliente.saldoDevedor)}</p>
-                                </div>
+            container.innerHTML = clientes.map(c => `
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden card-hover border border-gray-100">
+                    <div class="p-5 cursor-pointer" onclick="toggleHistorico('${c.id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold">${c.nome[0].toUpperCase()}</div>
+                                <div><h3 class="font-bold text-gray-800">${c.nome}</h3><p class="text-xs text-gray-400">${c.telefone || 'Sem fone'}</p></div>
                             </div>
-                            
-                            <!-- Cards de porcentagem -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                                <div class="bg-blue-50 rounded-xl p-3 text-center">
-                                    <p class="text-[10px] font-bold text-blue-600">% PAGO SOBRE PRINCIPAL</p>
-                                    <p class="text-2xl font-black text-blue-700">${cliente.percentualPagoSobrePrincipal.toFixed(1)}%</p>
-                                    <p class="text-xs">R$ ${formatBRL(cliente.totalPago + cliente.totalDescontos)} / R$ ${formatBRL(cliente.totalPrincipal)}</p>
-                                </div>
-                                <div class="bg-emerald-50 rounded-xl p-3 text-center">
-                                    <p class="text-[10px] font-bold text-emerald-600">% PAGO C/ JUROS</p>
-                                    <p class="text-2xl font-black text-emerald-700">${cliente.percentualPagoComJuros.toFixed(1)}%</p>
-                                    <p class="text-xs">da dívida total quitada</p>
-                                </div>
+                            <div class="text-right">
+                                <span class="badge ${c.saldoDevedor > 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}">${c.saldoDevedor > 0 ? 'PENDENTE' : 'QUITADO'}</span>
+                                <p class="text-xl font-black ${c.saldoDevedor > 0 ? 'text-red-600' : 'text-emerald-600'}">R$ ${formatBRL(c.saldoDevedor)}</p>
                             </div>
-                            
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 text-sm">
-                                <div><p class="text-[10px] text-gray-400">Principal</p><p class="font-bold">R$ ${formatBRL(cliente.totalPrincipal)}</p></div>
-                                <div><p class="text-[10px] text-gray-400">Juros Cobrados</p><p class="font-bold text-amber-600">R$ ${formatBRL(cliente.totalJuros)}</p></div>
-                                <div><p class="text-[10px] text-gray-400">Pagamentos</p><p class="font-bold text-emerald-600">R$ ${formatBRL(cliente.totalPago)}</p></div>
-                                <div><p class="text-[10px] text-gray-400">Descontos</p><p class="font-bold text-purple-600">R$ ${formatBRL(cliente.totalDescontos)}</p></div>
-                            </div>
-                            
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div class="progress-bar ${corProgresso} h-2.5 rounded-full" style="width: ${cliente.percentualPagoComJuros}%"></div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1 text-right">${cliente.percentualPagoComJuros.toFixed(1)}% da dívida total quitada</p>
                         </div>
-                        
-                        <div id="historico-${cliente.id}" class="hidden bg-gray-50 border-t border-gray-100 p-5">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-bold text-gray-700">📋 Histórico</h4>
-                                <div class="flex gap-2">
-                                    <button onclick="event.stopPropagation(); abrirModalOperacao('${cliente.id}')" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">+ Nova</button>
-                                    <button onclick="event.stopPropagation(); editarCliente('${cliente.id}')" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Editar</button>
-                                    <button onclick="event.stopPropagation(); excluirCliente('${cliente.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Excluir</button>
-                                </div>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-gray-100">
-                                        <tr><th class="p-2 text-left">Data</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-right">Valor</th><th class="p-2 text-right">Taxa</th><th class="p-2 text-center">Ação</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        ${historicoOrdenado.map((op, idx) => `<tr class="border-b"><td class="p-2 text-xs">${new Date(op.data).toLocaleDateString('pt-BR')}</td>
-                                                <td class="p-2 text-xs">${op.tipo === 'emprestimo' ? '💰 Empréstimo' : (op.tipo === 'pagamento' ? '💵 Pagamento' : (op.tipo === 'juros' ? '📈 Juros' : '🎯 Desconto'))}</td>
-                                                <td class="p-2 text-right text-xs">R$ ${formatBRL(op.valor)}</td>
-                                                <td class="p-2 text-right text-xs">${op.taxa ? op.taxa+'%' : '-'}</td>
-                                                <td class="p-2 text-center"><button onclick="event.stopPropagation(); excluirOperacao('${cliente.id}', ${idx})" class="text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></td>
-                                            </tr>`).join('')}
-                                        ${historicoOrdenado.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">Nenhuma operação</td></tr>' : ''}
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                            <div class="bg-blue-600 h-1.5 rounded-full" style="width: ${c.percentualPagoComJuros}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase">
+                            <span>Progresso de Quitação</span>
+                            <span>${c.percentualPagoComJuros.toFixed(1)}%</span>
                         </div>
                     </div>
-                `;
-            });
+                    <div id="historico-${c.id}" class="hidden bg-gray-50 p-5 border-t border-gray-100">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <button onclick="abrirModalOperacao('${c.id}')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">+ Operação</button>
+                            <button onclick="aplicarJuroIndividual('${c.id}')" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">📈 Aplicar Juro</button>
+                            <button onclick="compartilharCobranca('${c.id}')" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1"><i data-lucide="share-2" class="w-3 h-3"></i> Enviar</button>
+                            <button onclick="editarCliente('${c.id}')" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold">Editar</button>
+                            <button onclick="excluirCliente('${c.id}')" class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold">Excluir</button>
+                        </div>
+                        <div class="bg-white rounded-lg border overflow-hidden">
+                            <table class="w-full text-xs">
+                                <thead class="bg-gray-50 border-b">
+                                    <tr><th class="p-2 text-left">Data</th><th class="p-2 text-left">Tipo</th><th class="p-2 text-right">Valor</th><th class="p-2 text-center">Ação</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${c.historico.sort((a,b)=>new Date(b.data)-new Date(a.data)).map((op, idx) => `
+                                        <tr class="border-b">
+                                            <td class="p-2">${new Date(op.data).toLocaleDateString('pt-BR')}</td>
+                                            <td class="p-2 capitalize">${op.tipo}</td>
+                                            <td class="p-2 text-right font-bold">R$ ${formatBRL(op.valor)}</td>
+                                            <td class="p-2 text-center"><button onclick="excluirOperacao('${c.id}', ${idx})" class="text-red-400">✕</button></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
-        
-        window.toggleHistorico = (id) => { document.getElementById(`historico-${id}`)?.classList.toggle('hidden'); };
-        
-        function abrirModalCliente() { document.getElementById('modalCliente').style.display = 'flex'; }
-        function fecharModalCliente() { document.getElementById('modalCliente').style.display = 'none'; }
-        
-        function editarCliente(id) {
-            let c = clientes.find(c => c.id == id);
-            if(c) {
-                document.getElementById('clienteEditId').value = c.id;
-                document.getElementById('clienteNome').value = c.nome;
-                document.getElementById('clienteTelefone').value = c.telefone || '';
-                document.getElementById('clienteEmail').value = c.email || '';
-                document.getElementById('modalCliente').style.display = 'flex';
-            }
+
+        // Interface
+        window.toggleHistorico = (id) => document.getElementById(`historico-${id}`).classList.toggle('hidden');
+        function abrirModalCliente() { 
+            document.getElementById('formCliente').reset();
+            document.getElementById('clienteEditId').value = '';
+            document.getElementById('modalClienteTitle').innerText = 'Novo Cliente';
+            document.getElementById('modalCliente').style.display = 'flex'; 
         }
-        
-        function excluirCliente(id) { if(confirm('Excluir?')) { clientes = clientes.filter(c => c.id != id); salvarTudo(); mostrarToast('Cliente excluído'); } }
+        function fecharModalCliente() { document.getElementById('modalCliente').style.display = 'none'; }
         
         document.getElementById('formCliente').addEventListener('submit', (e) => {
             e.preventDefault();
-            let id = document.getElementById('clienteEditId').value;
-            let nome = document.getElementById('clienteNome').value.trim();
-            if(!nome) return alert('Nome obrigatório');
+            const id = document.getElementById('clienteEditId').value;
+            const dados = {
+                nome: document.getElementById('clienteNome').value,
+                telefone: document.getElementById('clienteTelefone').value,
+                email: document.getElementById('clienteEmail').value
+            };
             if(id) {
-                let idx = clientes.findIndex(c => c.id == id);
-                if(idx >= 0) { clientes[idx].nome = nome; clientes[idx].telefone = document.getElementById('clienteTelefone').value; clientes[idx].email = document.getElementById('clienteEmail').value; }
+                let c = clientes.find(x => x.id == id);
+                Object.assign(c, dados);
+                mostrarToast('Cliente atualizado!');
             } else {
-                clientes.push({ id: Date.now().toString(), nome, telefone: document.getElementById('clienteTelefone').value, email: document.getElementById('clienteEmail').value, historico: [], taxaJurosPadrao: 5 });
+                clientes.push({ id: Date.now().toString(), ...dados, historico: [], taxaJurosPadrao: 5 });
+                mostrarToast('Cliente cadastrado!');
             }
-            salvarTudo();
-            fecharModalCliente();
-            mostrarToast(id ? 'Atualizado' : 'Cadastrado');
+            salvarTudo(); fecharModalCliente();
         });
-        
-        function abrirModalOperacao(clienteId) {
-            document.getElementById('operacaoClienteId').value = clienteId;
+
+        function abrirModalOperacao(id) {
+            document.getElementById('operacaoClienteId').value = id;
             document.getElementById('operacaoValor').value = '';
-            document.getElementById('operacaoTaxa').value = '';
             document.getElementById('operacaoData').value = new Date().toISOString().split('T')[0];
-            document.getElementById('operacaoTipo').value = 'emprestimo';
-            document.getElementById('campoTaxa').classList.remove('hidden');
             document.getElementById('modalOperacao').style.display = 'flex';
         }
-        
         function fecharModalOperacao() { document.getElementById('modalOperacao').style.display = 'none'; }
-        
-        document.getElementById('operacaoTipo').addEventListener('change', function() {
-            document.getElementById('campoTaxa').classList.toggle('hidden', this.value !== 'emprestimo');
-        });
-        
+
         document.getElementById('formOperacao').addEventListener('submit', (e) => {
             e.preventDefault();
-            let clienteId = document.getElementById('operacaoClienteId').value;
-            let cliente = clientes.find(c => c.id == clienteId);
-            if(!cliente) return;
+            const id = document.getElementById('operacaoClienteId').value;
+            const c = clientes.find(x => x.id == id);
+            const tipo = document.getElementById('operacaoTipo').value;
+            const valor = parseBRL(document.getElementById('operacaoValor').value);
+            const taxa = parseBRL(document.getElementById('operacaoTaxa').value);
             
-            let tipo = document.getElementById('operacaoTipo').value;
-            let valor = parseBRL(document.getElementById('operacaoValor').value);
-            let taxa = parseBRL(document.getElementById('operacaoTaxa').value);
-            let data = document.getElementById('operacaoData').value;
-            
-            if(!valor || valor <= 0) { alert('Valor inválido'); return; }
-            if(tipo === 'emprestimo' && (!taxa || taxa <= 0)) { alert('Taxa de juros obrigatória'); return; }
-            
-            let operacao = { tipo, valor, data, taxa: taxa || 0 };
-            if(tipo === 'emprestimo') cliente.taxaJurosPadrao = taxa;
-            
-            cliente.historico.push(operacao);
-            salvarTudo();
-            fecharModalOperacao();
+            if(tipo === 'emprestimo' && taxa > 0) c.taxaJurosPadrao = taxa;
+            c.historico.push({ tipo, valor, data: document.getElementById('operacaoData').value });
+            salvarTudo(); fecharModalOperacao();
             mostrarToast('Operação registrada!');
         });
-        
-        function excluirOperacao(clienteId, opIndex) {
-            if(confirm('Excluir esta operação?')) {
-                let cliente = clientes.find(c => c.id == clienteId);
-                if(cliente && cliente.historico[opIndex]) {
-                    cliente.historico.splice(opIndex, 1);
-                    salvarTudo();
-                    mostrarToast('Operação removida');
-                }
-            }
+
+        function editarCliente(id) {
+            const c = clientes.find(x => x.id == id);
+            document.getElementById('clienteEditId').value = c.id;
+            document.getElementById('clienteNome').value = c.nome;
+            document.getElementById('clienteTelefone').value = c.telefone;
+            document.getElementById('clienteEmail').value = c.email;
+            document.getElementById('modalClienteTitle').innerText = 'Editar Cliente';
+            document.getElementById('modalCliente').style.display = 'flex';
         }
-        
-        function exportarDados() {
-            let dataStr = JSON.stringify(clientes, null, 2);
-            let blob = new Blob([dataStr], {type: 'application/json'});
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url; a.download = `credicontrol_${new Date().toISOString().split('T')[0]}.json`;
-            a.click(); URL.revokeObjectURL(url);
-        }
-        
-        if(clientes.length === 0) {
-            clientes = [{ id: "1", nome: "João Silva", telefone: "(11) 99999-9999", email: "joao@email.com", taxaJurosPadrao: 5, historico: [{ tipo: "emprestimo", valor: 5000, taxa: 5, data: "2024-01-15" }, { tipo: "pagamento", valor: 1500, data: "2024-02-20" }] }];
-        }
-        
+
+        function excluirCliente(id) { if(confirm('Excluir cliente e todo seu histórico?')) { clientes = clientes.filter(x => x.id != id); salvarTudo(); mostrarToast('Cliente removido'); } }
+        function excluirOperacao(cid, oidx) { if(confirm('Excluir esta operação?')) { clientes.find(x => x.id == cid).historico.splice(oidx, 1); salvarTudo(); mostrarToast('Operação removida'); } }
+
         salvarTudo();
     </script>
 </body>
 </html>
+
